@@ -49,7 +49,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const token = sign({ sub: newUser._id }, config.JWT_SECRET as string, { expiresIn: "7d" });
 
-        res.json({
+        res.status(201).json({
             message: "user created!",
             accessToken: token
         })
