@@ -151,38 +151,44 @@ const getBook = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
-// const deleteBook = async (req: Request, res: Response, next: NextFunction) => {
-//     try {
-//         const bookId = req.params.bookId;
+const deleteBook = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const bookId = req.params.bookId;
 
-//         // Find the book first to get its file URLs
-//         const book = await bookModel.findOne({ _id: bookId });
+        // Find the book first to get its file URLs
+        const book = await bookModel.findOne({ _id: bookId });
 
-//         if (!book) {
-//             return next(createHttpError(404, "Book Not Found"));
-//         }
+        if (!book) {
+            return next(createHttpError(404, "Book Not Found"));
+        }
 
-//         // Extract public IDs from Cloudinary URLs to delete the files
-//         const coverImagePublicId = book.coverImage ? book.coverImage.split('/').pop()?.split('.')[0] : null;
-//         const bookFilePublicId = book.file ? book.file.split('/').pop()?.split('.')[0] : null;
+        // Check user access
+        const _req = req as AuthRequest;
+        if(book.author.toString() !== _req.userId){
+            return next(createHttpError(403, "Unauthorized"));
+        }
 
-//         // Delete cover image from Cloudinary, if exists
-//         if (coverImagePublicId) {
-//             await cloudinary.uploader.destroy(`book-cover/${coverImagePublicId}`);
-//         }
+        // Extract public IDs from Cloudinary URLs to delete the files
+        const coverImagePublicId = book.coverImage ? book.coverImage.split('/').pop()?.split('.')[0] : null;
+        const bookFilePublicId = book.file ? book.file.split('/').pop()?.split('.')[0] : null;
+        
+        // Delete cover image from Cloudinary, if exists
+        if (coverImagePublicId) {
+            await cloudinary.uploader.destroy(`book-cover/${coverImagePublicId}`);
+        }
 
-//         // Delete book file (PDF) from Cloudinary, if exists
-//         if (bookFilePublicId) {
-//             await cloudinary.uploader.destroy(`books-pdf/${bookFilePublicId}`, { resource_type: 'raw' });
-//         }
+        // Delete book file (PDF) from Cloudinary, if exists
+        if (bookFilePublicId) {
+            await cloudinary.uploader.destroy(`books-pdf/${bookFilePublicId}.pdf`, { resource_type: 'raw' });
+        }
 
-//         // Delete the book from the database
-//         await bookModel.findOneAndDelete({ _id: bookId });
+        // Delete the book from the database
+        await bookModel.findOneAndDelete({ _id: bookId });
 
-//         res.json({ message: "Book and associated files removed successfully" });
-//     } catch (error) {
-//         return next(createHttpError(500, "Error while deleting book"));
-//     }
-// };
+        res.status(204).json({ message: "Book and associated files removed successfully" });
+    } catch (error) {
+        return next(createHttpError(500, "Error while deleting book"));
+    }
+};
 
-export { createBook, updateBook, listBooks, getBook };
+export { createBook, updateBook, listBooks, getBook, deleteBook };
