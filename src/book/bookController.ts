@@ -15,6 +15,13 @@ const createBook = async (req: Request, res: Response, next: NextFunction) => {
     const { title, genre } = req.body;
 
     try {
+
+        const book = await bookModel.findOne({ title: title });
+
+        if(book) {
+            return next(createHttpError(403, "Book already created with this name"));
+        }
+
         const files = req.files as { [filename: string]: Express.Multer.File[]}
         const coverImageMimeType = files.coverImage[0].mimetype.split('/').at(-1);
         const fileName = files.coverImage[0].filename;
@@ -48,7 +55,7 @@ const createBook = async (req: Request, res: Response, next: NextFunction) => {
         await fs.promises.unlink(filePath);
         await fs.promises.unlink(bookFilePath);
     
-        res.status(201).json({ id: newBook._id })
+        res.status(201).json({ id: newBook._id, message: "book created" })
     } catch (error) {
         return next(createHttpError(500, "Error while uploading the files."))
     }
@@ -114,7 +121,68 @@ const updateBook = async (req: Request, res: Response, next: NextFunction) => {
         { new: true }
     )
 
-    res.status(200).json(updateBook);
+    res.status(200).json({message: "book updated",updateBook: updateBook});
 }
 
-export { createBook, updateBook };
+const listBooks = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        // todo add pagination
+        const books = await bookModel.find();
+
+        res.json(books)
+    } catch (error) {
+        return next(createHttpError(500, "Error while getting books"))
+    }
+}
+
+const getBook = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const bookId = req.params.bookId;
+
+        const book = await bookModel.findOne({ _id: bookId });
+
+        if(!book){
+            return next(createHttpError(404, "Book Not Found"))
+        }
+
+        res.json(book)
+    } catch (error) {
+        return next(createHttpError(500, "Error while getting book"))
+    }
+}
+
+// const deleteBook = async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//         const bookId = req.params.bookId;
+
+//         // Find the book first to get its file URLs
+//         const book = await bookModel.findOne({ _id: bookId });
+
+//         if (!book) {
+//             return next(createHttpError(404, "Book Not Found"));
+//         }
+
+//         // Extract public IDs from Cloudinary URLs to delete the files
+//         const coverImagePublicId = book.coverImage ? book.coverImage.split('/').pop()?.split('.')[0] : null;
+//         const bookFilePublicId = book.file ? book.file.split('/').pop()?.split('.')[0] : null;
+
+//         // Delete cover image from Cloudinary, if exists
+//         if (coverImagePublicId) {
+//             await cloudinary.uploader.destroy(`book-cover/${coverImagePublicId}`);
+//         }
+
+//         // Delete book file (PDF) from Cloudinary, if exists
+//         if (bookFilePublicId) {
+//             await cloudinary.uploader.destroy(`books-pdf/${bookFilePublicId}`, { resource_type: 'raw' });
+//         }
+
+//         // Delete the book from the database
+//         await bookModel.findOneAndDelete({ _id: bookId });
+
+//         res.json({ message: "Book and associated files removed successfully" });
+//     } catch (error) {
+//         return next(createHttpError(500, "Error while deleting book"));
+//     }
+// };
+
+export { createBook, updateBook, listBooks, getBook };
