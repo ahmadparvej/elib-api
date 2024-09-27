@@ -1,9 +1,6 @@
 
-import { raw, Request, Response, NextFunction } from 'express';
-import bcrypt from 'bcrypt';
-import { sign } from 'jsonwebtoken';
+import { Request, Response, NextFunction } from 'express';
 import createHttpError from 'http-errors';
-import { config } from './../config/config';
 import cloudinary from './../config/cloudinary';
 import path from 'node:path';
 import bookModel from './bookModel';
