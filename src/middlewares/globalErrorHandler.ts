@@ -6,7 +6,7 @@ import { config } from './../config/config';
 const globalErrorHandler = (err: HttpError, req: Request, res: Response, next: NextFunction)=> {
     const statusCode = err?.statusCode || 500;
     return res.status(statusCode).json({
-        messaage: err.message,
+        message: err.message,
         errorStack: config.ENV === 'development'? err.stack : ''
     })
 }
