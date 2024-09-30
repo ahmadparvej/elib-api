@@ -8,6 +8,7 @@ const bookSchema = new mongoose.Schema<Book>(
     coverImage: { type: String, required: true },
     file: { type: String, required: true },
     genre: { type: String, required: true },
+    description: { type: String, required: true },
   },
   { timestamps: true }
 );
