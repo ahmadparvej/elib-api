@@ -184,7 +184,7 @@ const deleteBook = async (req: Request, res: Response, next: NextFunction) => {
         // Delete the book from the database
         await bookModel.findOneAndDelete({ _id: bookId });
 
-        res.status(204).json({ message: "Book and associated files removed successfully" });
+        res.status(200).json({ message: "Book and associated files removed successfully" });
     } catch (error) {
         return next(createHttpError(500, "Error while deleting book"));
     }
