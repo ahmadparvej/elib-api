@@ -126,10 +126,22 @@ const updateBook = async (req: Request, res: Response, next: NextFunction) => {
 const listBooks = async (req: Request, res: Response, next: NextFunction) => {
     try {
         // todo add pagination
-        const _req = req as AuthRequest;
-        const books = await bookModel.find({ author: _req.userId});
 
-        res.json(books)
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 3;
+
+        const _req = req as AuthRequest;
+
+        const totalBooks = await bookModel.countDocuments({ author: _req.userId});
+
+        const books = await bookModel.find({ author: _req.userId}).skip((page-1)*limit).limit(limit);
+
+        res.json({
+            books,
+            totalBooks,
+            totalPages: Math.ceil(totalBooks / limit),
+            currentPage: page,
+          })
     } catch (error) {
         return next(createHttpError(500, "Error while getting books"))
     }
