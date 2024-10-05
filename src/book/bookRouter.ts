@@ -22,7 +22,7 @@ bookRouter.patch('/update/:bookId', authenticate,  upload.fields([
     { name: 'file', maxCount: 1 }
 ]), updateBook);
 
-bookRouter.get('/getAll', listBooks);
+bookRouter.get('/getAll', authenticate, listBooks);
 
 bookRouter.get('/:bookId', getBook);
 
