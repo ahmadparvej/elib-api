@@ -154,11 +154,8 @@ const listBooks = async (req: Request, res: Response, next: NextFunction) => {
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 6;
 
-        const _req = req as AuthRequest;
-
         const totalBooks = await bookModel.countDocuments({});
-
-        const books = await bookModel.find({}).skip((page-1)*limit).limit(limit);
+        const books = await bookModel.find({}).populate("author", "name").skip((page-1)*limit).limit(limit);
 
         res.json({
             books,
@@ -174,8 +171,7 @@ const listBooks = async (req: Request, res: Response, next: NextFunction) => {
 const getBook = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const bookId = req.params.bookId;
-        const _req = req as AuthRequest;
-        const book = await bookModel.findOne({ _id: bookId, author: _req.userId });
+        const book = await bookModel.findOne({ _id: bookId}).populate("author", "name email");
 
         if(!book){
             return next(createHttpError(404, "Book Not Found"))
