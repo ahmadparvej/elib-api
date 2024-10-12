@@ -2,7 +2,7 @@
 import express from 'express';
 import multer from 'multer';
 import path from 'node:path';
-import { createBook, updateBook, listBooks, getBook, deleteBook } from './bookController';
+import { createBook, updateBook, listBooks, getBook, deleteBook, listUsersBooks } from './bookController';
 import authenticate from './../middlewares/authenticate';
 
 const bookRouter = express.Router();
@@ -22,7 +22,9 @@ bookRouter.patch('/update/:bookId', authenticate,  upload.fields([
     { name: 'file', maxCount: 1 }
 ]), updateBook);
 
-bookRouter.get('/getAll', authenticate, listBooks);
+bookRouter.get('/getAll', authenticate, listUsersBooks);
+
+bookRouter.get('', listBooks);
 
 bookRouter.get('/:bookId', getBook);
 

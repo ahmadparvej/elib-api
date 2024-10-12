@@ -123,7 +123,7 @@ const updateBook = async (req: Request, res: Response, next: NextFunction) => {
     res.status(200).json({message: "book updated",updateBook: updateBook});
 }
 
-const listBooks = async (req: Request, res: Response, next: NextFunction) => {
+const listUsersBooks = async (req: Request, res: Response, next: NextFunction) => {
     try {
         // todo add pagination
 
@@ -140,6 +140,30 @@ const listBooks = async (req: Request, res: Response, next: NextFunction) => {
             books,
             totalBooks,
             totalPages: Math.ceil(totalBooks / limit),
+            currentPage: page,
+          })
+    } catch (error) {
+        return next(createHttpError(500, "Error while getting books"))
+    }
+}
+
+const listBooks = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        // todo add pagination
+
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 6;
+
+        const _req = req as AuthRequest;
+
+        const totalBooks = await bookModel.countDocuments({});
+
+        const books = await bookModel.find({}).skip((page-1)*limit).limit(limit);
+
+        res.json({
+            books,
+            totalBooks,
+            totalPages: Math.ceil(totalBooks/limit),
             currentPage: page,
           })
     } catch (error) {
@@ -203,4 +227,4 @@ const deleteBook = async (req: Request, res: Response, next: NextFunction) => {
     }
 };
 
-export { createBook, updateBook, listBooks, getBook, deleteBook };
+export { createBook, updateBook, listUsersBooks, listBooks, getBook, deleteBook };
