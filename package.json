@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon server.ts"
+    "dev": "nodemon server.ts",
+    "build": "tsc",
+    "docker:publish": "docker build -t ahmadparvej/elib-backend:v2 --platform linux/amd64 . && docker push ahmadparvej/elib-backend:v2"
   },
   "keywords": [
     "rest",
@@ -26,7 +28,6 @@
     "@types/node": "^22.5.5",
     "eslint": "^9.11.0",
     "globals": "^15.9.0",
-    "multer": "^1.4.5-lts.1",
     "nodemon": "^3.1.7",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.2",
@@ -41,6 +42,7 @@
     "express": "^4.21.0",
     "http-errors": "^2.0.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.6.3"
+    "mongoose": "^8.6.3",
+    "multer": "^1.4.5-lts.1"
   }
 }
