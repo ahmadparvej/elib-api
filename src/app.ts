@@ -1,5 +1,4 @@
 import express from "express";
-import createHttpError, { HttpError } from "http-errors";
 import globalErrorHandler from './middlewares/globalErrorHandler';
 import userRouter from './user/userRouter';
 import bookRouter from './book/bookRouter';
@@ -15,10 +14,6 @@ app.use(express.json());
 //Routes
 
 app.get('/', (req, res)=> {
-
-    const error = createHttpError(400, "something went wrong");
-    throw error;
-
     res.json({ status: 'success', message: 'Welcome to ebook apis' });
 });
 
